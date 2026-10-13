@@ -25,6 +25,7 @@ class DatabaseSeeder extends Seeder
             [
                 'name'     => 'Admin Toko Hijab',
                 'password' => Hash::make('password123'),
+                'role'     => 'admin',
             ]
         );
 
@@ -33,6 +34,7 @@ class DatabaseSeeder extends Seeder
             [
                 'name'     => 'Staff Inventori',
                 'password' => Hash::make('password123'),
+                'role'     => 'staff',
             ]
         );
 

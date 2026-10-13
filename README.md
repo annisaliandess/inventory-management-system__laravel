@@ -148,7 +148,8 @@ Hasil eksekusi `php artisan route:list`:
    - Masukkan kredensial pengujian (`admin@tokohijab` / `password123`).
 2. **Katalog & Filter Data**:
    - Setelah login, pengguna melihat dashboard katalog produk, kartu statistik stok, filter kategori, pencarian, dan tombol aksi.
-3. **Validasi Form Tambah Produk**:
+3. **Validasi For
+m Tambah Produk**:
    - Klik tombol **"+ Tambah Produk"**.
    - Jika pengguna sengaja mengosongkan kolom wajib atau memasukkan SKU yang sudah ada, Laravel akan mengembalikan pesan error validasi spesifik di bawah kolom input (`@error`).
    - Jika data valid, produk tersimpan dan muncul notifikasi flash alert sukses.
@@ -177,16 +178,20 @@ php artisan serve
 ```
 
 ### Akun Uji Coba Default
-- **Email**: `admin@tokohijab`
-- **Password**: `password123`
-- **Email**: `staff@tokohijab` 
-- **password**: `password123`
+- **Administrator (Akses Penuh CRUD, Nilai Aset, Mutasi)**:
+  - **Email**: `admin@tokohijab`
+  - **Password**: `password123`
+  - **Peran**: `admin`
+- **Staff (Operasional Kasir / Gudang: Mutasi Stok, Monitoring, Search)**:
+  - **Email**: `staff@tokohijab` 
+  - **Password**: `password123`
+  - **Peran**: `staff`
 
 ---
 
 ## 8. Pengujian Otomatis (Automated Testing)
 
-Semua skenario pengujian feature dan unit telah diuji dan lulus (100% PASS):
+Semua skenario pengujian feature dan unit telah diuji dan lulus (100% PASS), termasuk pengujian otorisasi peran Admin & Staff:
 
 ```bash
 php artisan test
@@ -198,16 +203,18 @@ php artisan test
   ✓ that true is true                                                                   0.01s  
 
    PASS  Tests\Feature\ExampleTest
-  ✓ the application returns a successful response                                       0.24s  
+  ✓ the application returns a successful response                                       0.35s  
 
    PASS  Tests\Feature\ProductCrudTest
-  ✓ guest is redirected to login                                                        0.17s  
-  ✓ can authenticate and access products                                                0.04s  
+  ✓ guest is redirected to login                                                        0.24s  
+  ✓ can authenticate and access products                                                0.06s  
+  ✓ staff can view dashboard with operational metrics                                   0.03s  
+  ✓ staff cannot create or delete product                                               0.05s  
   ✓ can create and store product with supplier                                          0.04s  
-  ✓ can update product                                                                  0.02s  
+  ✓ can update product                                                                  0.03s  
   ✓ can record stock mutation                                                           0.03s  
-  ✓ can delete product                                                                  0.02s  
+  ✓ can delete product                                                                  0.03s  
 
-  Tests:    8 passed (18 assertions)
-  Duration: 0.76s
+  Tests:    10 passed (24 assertions)
+  Duration: 1.14s
 ```

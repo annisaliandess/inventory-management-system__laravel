@@ -62,6 +62,17 @@ class ProductController extends Controller
         $totalStock = (int) Product::sum('stock');
         $lowStockCount = Product::where('stock', '<=', 5)->count();
 
+        // Metrik khusus Admin: Estimasi total nilai aset inventori (stock * price)
+        $totalAssetValue = (float) Product::selectRaw('SUM(stock * price) as total_val')->value('total_val') ?? 0;
+
+        // Metrik operasional Staf & Admin: Mutasi hari ini (barang masuk & keluar)
+        $todayIn = (int) \App\Models\StockTransaction::whereDate('created_at', today())
+            ->where('type', 'masuk')
+            ->sum('amount');
+        $todayOut = (int) \App\Models\StockTransaction::whereDate('created_at', today())
+            ->where('type', 'keluar')
+            ->sum('amount');
+
         return view('products.index', compact(
             'products',
             'categories',
@@ -73,7 +84,10 @@ class ProductController extends Controller
             'direction',
             'totalProducts',
             'totalStock',
-            'lowStockCount'
+            'lowStockCount',
+            'totalAssetValue',
+            'todayIn',
+            'todayOut'
         ));
     }
 

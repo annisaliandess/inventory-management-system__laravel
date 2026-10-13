@@ -14,13 +14,18 @@ class ProductCrudTest extends TestCase
     use RefreshDatabase;
 
     protected User $user;
+    protected User $staffUser;
 
     protected function setUp(): void
     {
         parent::setUp();
-        // Buat user terautentikasi untuk pengujian
-        $this->user = User::factory()->create([
-            'email' => 'tester@toko-hijab.test',
+        // Buat user terautentikasi untuk pengujian (Admin & Staff)
+        $this->user = User::factory()->admin()->create([
+            'email' => 'admin@toko-hijab.test',
+        ]);
+
+        $this->staffUser = User::factory()->staff()->create([
+            'email' => 'staff@toko-hijab.test',
         ]);
     }
 
@@ -35,6 +40,33 @@ class ProductCrudTest extends TestCase
         $response = $this->actingAs($this->user)->get(route('products.index'));
         $response->assertStatus(200);
         $response->assertSee('Inventori Toko Hijab');
+        $response->assertSee('Dashboard Administrator Inventori');
+    }
+
+    public function test_staff_can_view_dashboard_with_operational_metrics(): void
+    {
+        $response = $this->actingAs($this->staffUser)->get(route('products.index'));
+        $response->assertStatus(200);
+        $response->assertSee('Dashboard Staf Gudang &amp; Kasir', false);
+        $response->assertSee('Aktivitas Hari Ini');
+    }
+
+    public function test_staff_cannot_create_or_delete_product(): void
+    {
+        $responseCreate = $this->actingAs($this->staffUser)->get(route('products.create'));
+        $responseCreate->assertStatus(403);
+
+        $category = Category::firstOrCreate(['name' => 'Khimar']);
+        $product = Product::create([
+            'category_id' => $category->id,
+            'sku'         => 'TEST-STAFF-DEL',
+            'name'        => 'Khimar Coba Dihapus Staff',
+            'price'       => 50000,
+            'stock'       => 5,
+        ]);
+
+        $responseDelete = $this->actingAs($this->staffUser)->delete(route('products.destroy', $product->id));
+        $responseDelete->assertStatus(403);
     }
 
     public function test_can_create_and_store_product_with_supplier(): void

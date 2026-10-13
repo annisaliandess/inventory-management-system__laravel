@@ -321,6 +321,10 @@
             gap: 6px;
             min-width: 190px;
         }
+        .action-grid.staff-view {
+            grid-template-columns: repeat(2, 1fr);
+            min-width: 160px;
+        }
 
         .btn-act {
             display: inline-flex;
@@ -465,7 +469,12 @@
                 @auth
                     <div class="user-pill">
                         <i class="bi bi-person-circle text-secondary"></i>
-                        <span>{{ Auth::user()->name }}</span>
+                        <span><strong>{{ Auth::user()->name }}</strong></span>
+                        @if(Auth::user()->isAdmin())
+                            <span class="badge" style="background-color: var(--primary); color: #fff; font-size: 11px; padding: 4px 8px; border-radius: 20px;">👑 Admin</span>
+                        @else
+                            <span class="badge" style="background-color: #0284c7; color: #fff; font-size: 11px; padding: 4px 8px; border-radius: 20px;">🧕 Staff</span>
+                        @endif
                     </div>
                 @endauth
                 <a href="{{ route('products.index') }}" class="btn-custom-secondary">
@@ -477,9 +486,11 @@
                 <a href="{{ route('transactions.index') }}" class="btn-custom-secondary">
                     <i class="bi bi-clock-history"></i> Log Mutasi
                 </a>
-                <a href="{{ route('products.create') }}" class="btn-custom-primary">
-                    <i class="bi bi-plus-circle"></i> + Tambah Produk
-                </a>
+                @if(Auth::user() && Auth::user()->isAdmin())
+                    <a href="{{ route('products.create') }}" class="btn-custom-primary">
+                        <i class="bi bi-plus-circle"></i> + Tambah Produk
+                    </a>
+                @endif
                 @auth
                     <form action="{{ route('logout') }}" method="POST" class="d-inline" onsubmit="return confirm('Apakah Anda yakin ingin keluar?')">
                         @csrf

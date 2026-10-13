@@ -20,8 +20,19 @@ Route::middleware('auth')->group(function () {
         return redirect()->route('products.index');
     });
 
-    // Resource CRUD Produk
-    Route::resource('products', ProductController::class);
+    // Manajemen Produk (Hanya Admin: Tambah, Ubah, Hapus)
+    Route::middleware('role:admin')->group(function () {
+        Route::get('products/create', [ProductController::class, 'create'])->name('products.create');
+        Route::post('products', [ProductController::class, 'store'])->name('products.store');
+        Route::get('products/{product}/edit', [ProductController::class, 'edit'])->name('products.edit');
+        Route::put('products/{product}', [ProductController::class, 'update'])->name('products.update');
+        Route::patch('products/{product}', [ProductController::class, 'update']);
+        Route::delete('products/{product}', [ProductController::class, 'destroy'])->name('products.destroy');
+    });
+
+    // Akses Produk: Staff & Admin bisa melihat katalog produk (index & show)
+    Route::get('products', [ProductController::class, 'index'])->name('products.index');
+    Route::get('products/{product}', [ProductController::class, 'show'])->name('products.show');
 
     // Transaksi Stok & Riwayat Mutasi (Masuk / Keluar)
     Route::get('transactions', [StockTransactionController::class, 'index'])->name('transactions.index');
